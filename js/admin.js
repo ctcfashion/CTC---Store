@@ -99,33 +99,27 @@ function togglePassword() {
 //   PRODUCTS (stored in localStorage)
 // =============================================
 function loadProducts() {
-  const stored = localStorage.getItem("ctc-products");
-  if (stored) {
-    products = JSON.parse(stored);
-  } else {
-    // Try fetching from JSON file first
-    fetch("data/products.json")
-      .then(r => r.json())
-      .then(data => {
-        // Add stock field if missing
-        products = data.map(p => ({ ...p, stock: p.stock ?? 10 }));
-        saveProducts();
-        refreshAll();
-      })
-      .catch(() => {
-        products = getDefaultProducts();
-        saveProducts();
-        refreshAll();
-      });
-    return;
-  }
-  refreshAll();
+  fetch(PRODUCTS_API)
+    .then(r => r.json())
+    .then(data => {
+      products = Array.isArray(data) ? data : Object.values(data || {});
+      refreshAll();
+    })
+    .catch(() => {
+      showAdminToast("⚠️ Could not load live products. Check internet connection.", "error");
+      products = getDefaultProducts();
+      refreshAll();
+    });
 }
 
 function saveProducts() {
-  localStorage.setItem("ctc-products", JSON.stringify(products));
-  // Also update the storefront cart data store key
-  localStorage.setItem("ctc-products-updated", Date.now().toString());
+  fetch(PRODUCTS_API, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(products)
+  }).catch(() => {
+    showAdminToast("⚠️ Could not save changes. Check internet connection.", "error");
+  });
 }
 
 function refreshAll() {
