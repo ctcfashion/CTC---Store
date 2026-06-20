@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CTC Fashion & Luggage Wear — School Uniforms, Fashion Wear & Bags at Mungate Shopping Centre, Domboshava">
+  <title>CTC Fashion & Luggage Wear</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👔</text></svg>">
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#home" class="nav-logo">
+        <div class="logo-icon">CTC</div>
+        <div class="logo-text">
+          <span class="brand">CTC</span>
+          <span class="tagline">Fashion & Luggage Wear</span>
+        </div>
+      </a>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#home" class="active">Home</a></li>
+        <li><a href="#shop">Shop</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-search">
+        <input class="search-input" type="text" placeholder="Search products...">
+        <button class="search-btn">🔍</button>
+      </div>
+
+      <div class="nav-actions">
+        <button class="cart-btn" onclick="openCart()" title="View Cart">
+          🛒
+          <span class="cart-badge" style="display:none">0</span>
+        </button>
+        <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<section class="hero" id="home">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-tag">✦ Domboshava's Favourite Store</div>
+        <h1>Your Best <span>Tailor</span> &amp; Fashion Stop</h1>
+        <p>School uniforms, fashion wear, and quality bags — all under one roof at Mungate Shopping Centre, Domboshava.</p>
+        <div class="hero-btns">
+          <a href="#shop" class="btn btn-gold">Shop Now →</a>
+          <a href="https://wa.me/263771621449" target="_blank" class="btn btn-whatsapp">💬 WhatsApp Us</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-num">15+</span>
+            <span class="stat-label">Product Types</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">3</span>
+            <span class="stat-label">Categories</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">⭐ 4.8</span>
+            <span class="stat-label">Customer Rating</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-img-card">
+          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80" alt="Fashion Store">
+        </div>
+        <div class="hero-img-card">
+          <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80" alt="Bags">
+        </div>
+        <div class="hero-img-card">
+          <img src="https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?w=400&q=80" alt="Uniforms">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CATEGORIES ========== -->
+<section class="categories-strip">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Shop by Category</h2>
+      <p class="section-subtitle">Find exactly what you need</p>
+    </div>
+    <div class="categories-grid">
+      <a class="cat-card active" data-cat="All" onclick="setFilter('All');scrollToShop()" href="#shop">
+        <div class="cat-icon">🏪</div>
+        <span class="cat-name">All Products</span>
+        <span class="cat-count">View everything</span>
+      </a>
+      <a class="cat-card" data-cat="School Uniforms" onclick="setFilter('School Uniforms');scrollToShop()" href="#shop">
+        <div class="cat-icon">🎒</div>
+        <span class="cat-name">School Uniforms</span>
+        <span class="cat-count">Blazers, shirts, tracksuits & more</span>
+      </a>
+      <a class="cat-card" data-cat="Fashion Wear" onclick="setFilter('Fashion Wear');scrollToShop()" href="#shop">
+        <div class="cat-icon">👗</div>
+        <span class="cat-name">Fashion Wear</span>
+        <span class="cat-count">Dresses, worksuits, anoraks</span>
+      </a>
+      <a class="cat-card" data-cat="Bags" onclick="setFilter('Bags');scrollToShop()" href="#shop">
+        <div class="cat-icon">👜</div>
+        <span class="cat-name">Bags</span>
+        <span class="cat-count">Satchels, sports, laptop bags</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FEATURED ========== -->
+<section style="padding:20px 0 60px; background:var(--white);">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Featured Products</h2>
+      <p class="section-subtitle">Hand-picked for you this season</p>
+    </div>
+    <div class="products-grid" id="featured-grid"></div>
+  </div>
+</section>
+
+<!-- ========== BANNER ========== -->
+<div class="banner-strip">
+  <div class="container">
+    <div class="banner-inner">
+      <div class="banner-text">
+        <h2>Custom Tailoring Available 🪡</h2>
+        <p>Need a perfect fit? We do custom tailoring for school uniforms and fashion wear. Contact us today.</p>
+      </div>
+      <div class="banner-actions">
+        <a href="https://wa.me/263771621449?text=Hello!%20I%20need%20custom%20tailoring." target="_blank" class="btn btn-whatsapp">💬 Enquire on WhatsApp</a>
+        <a href="tel:+263771621449" class="btn btn-gold">📞 Call Now</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SHOP / ALL PRODUCTS ========== -->
+<section class="products-section" id="shop" style="padding-top:70px">
+  <div class="container">
+    <div class="section-header" style="margin-bottom:20px">
+      <h2 class="section-title">Our Shop</h2>
+      <p class="section-subtitle">Browse our full collection</p>
+    </div>
+
+    <div class="products-controls" id="filter-controls">
+      <button class="filter-btn active" data-cat="All" onclick="setFilter('All')">All</button>
+      <button class="filter-btn" data-cat="School Uniforms" onclick="setFilter('School Uniforms')">🎒 School Uniforms</button>
+      <button class="filter-btn" data-cat="Fashion Wear" onclick="setFilter('Fashion Wear')">👗 Fashion Wear</button>
+      <button class="filter-btn" data-cat="Bags" onclick="setFilter('Bags')">👜 Bags</button>
+    </div>
+
+    <div class="products-grid" id="products-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--grey-500)">Loading products...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== BEST SELLERS ========== -->
+<section style="padding:60px 0; background:var(--white);">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">⭐ Best Sellers</h2>
+      <p class="section-subtitle">What our customers love most</p>
+    </div>
+    <div class="products-grid" id="bestseller-grid"></div>
+  </div>
+</section>
+
+<!-- ========== INFO STRIP ========== -->
+<div class="info-strip">
+  <div class="container">
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-icon">📍</div>
+        <div class="info-title">Find Us</div>
+        <div class="info-text">Mungate Shopping Centre, Domboshava</div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">✂️</div>
+        <div class="info-title">Custom Tailoring</div>
+        <div class="info-text">Uniforms & fashion made to measure</div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">💬</div>
+        <div class="info-title">WhatsApp Orders</div>
+        <div class="info-text">Order directly via WhatsApp</div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">⭐</div>
+        <div class="info-title">Quality Guarantee</div>
+        <div class="info-text">Trusted by families across Domboshava</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ABOUT ========== -->
+<section class="about-section" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-img">
+        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80" alt="CTC Store" loading="lazy">
+      </div>
+      <div class="about-content">
+        <div class="about-tag">Our Story</div>
+        <h2>Your Trusted Fashion & Luggage Destination</h2>
+        <p>CTC Fashion & Luggage Wear is your go-to store at Mungate Shopping Centre in Domboshava. We specialise in quality school uniforms, stylish fashion wear, and durable bags for the whole family.</p>
+        <p>Whether you need blazers and tracksuits for the new school term, a smart worksuit for the office, or a reliable laptop bag — we've got you covered. With expert tailoring on-site, every fit is personal.</p>
+        <div class="about-highlights">
+          <div class="highlight"><div class="highlight-dot"></div>School uniforms tailored to your school's requirements</div>
+          <div class="highlight"><div class="highlight-dot"></div>Fashion wear for every occasion and style</div>
+          <div class="highlight"><div class="highlight-dot"></div>Wide range of bags — school, travel, work and casual</div>
+          <div class="highlight"><div class="highlight-dot"></div>Custom tailoring service available in-store</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CONTACT ========== -->
+<section class="contact-section" id="contact">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Get In Touch</h2>
+      <p class="section-subtitle">We're always happy to help — reach out anytime</p>
+    </div>
+    <div class="contact-grid">
+      <a class="contact-card" href="https://wa.me/263771621449" target="_blank">
+        <div class="contact-icon">💬</div>
+        <div>
+          <div class="contact-label">WhatsApp</div>
+          <div class="contact-value">+263 771 621 449</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:4px">Tap to open WhatsApp</div>
+        </div>
+      </a>
+      <a class="contact-card" href="tel:+263716932768">
+        <div class="contact-icon">📞</div>
+        <div>
+          <div class="contact-label">Phone</div>
+          <div class="contact-value">0771 621 449 / 0716 932 768</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:4px">Call us directly</div>
+        </div>
+      </a>
+      <a class="contact-card" href="mailto:calvinchinyama93@gmail.com">
+        <div class="contact-icon">✉️</div>
+        <div>
+          <div class="contact-label">Email</div>
+          <div class="contact-value" style="word-break:break-all">calvinchinyama93@gmail.com</div>
+        </div>
+      </a>
+      <div class="contact-card">
+        <div class="contact-icon">📍</div>
+        <div>
+          <div class="contact-label">Location</div>
+          <div class="contact-value">Mungate Shopping Centre</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:4px">Domboshava, Zimbabwe</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:48px">
+      <a href="https://wa.me/263771621449?text=Hello%20CTC!%20I%20would%20like%20to%20place%20an%20order." target="_blank" class="btn btn-whatsapp" style="font-size:1rem;padding:16px 36px;">
+        💬 Order via WhatsApp Now
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">CTC <span>Fashion & Luggage Wear</span></div>
+        <div style="font-size:0.78rem;margin-top:4px">Mungate Shopping Centre, Domboshava</div>
+      </div>
+      <div class="footer-copy">© 2025 CTC Fashion & Luggage Wear. All rights reserved.</div>
+      <div class="footer-links">
+        <a href="#home">Home</a>
+        <a href="#shop">Shop</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ========== PRODUCT MODAL ========== -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-grid">
+      <div class="modal-img"><img src="" alt=""></div>
+      <div class="modal-body">
+        <div class="modal-category"></div>
+        <div class="modal-name"></div>
+        <div class="modal-stars" style="color:var(--gold);font-size:0.85rem"></div>
+        <div class="modal-price"></div>
+        <div class="modal-desc"></div>
+        <div class="modal-actions">
+          <div class="qty-control">
+            <button class="qty-btn" onclick="changeModalQty(-1)">−</button>
+            <span class="qty-num" id="modal-qty">1</span>
+            <button class="qty-btn" onclick="changeModalQty(1)">+</button>
+            <span style="font-size:0.8rem;color:var(--grey-500)">Quantity</span>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="addToCartFromModal()">🛒 Add to Cart</button>
+          <button class="btn btn-whatsapp" style="width:100%;justify-content:center" onclick="whatsappFromModal()">💬 Order via WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== CART DRAWER ========== -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-header">
+    <h3>🛒 Your Cart</h3>
+    <button class="cart-close-btn" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-amount" id="cart-total">$0.00</span>
+    </div>
+    <button class="cart-checkout-btn" onclick="checkoutWhatsApp()">
+      💬 Checkout via WhatsApp
+    </button>
+    <div class="cart-note">You'll confirm your order directly with us on WhatsApp</div>
+  </div>
+</div>
+
+<!-- ========== TOAST ========== -->
+<div class="toast" id="toast">
+  <span class="toast-msg"></span>
+</div>
+
+<!-- ========== SCROLL TO TOP ========== -->
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<script src="js/app.js"></script>
+<script>
+  function scrollToShop() {
+    setTimeout(() => document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' }), 50);
+  }
+
+  // Smooth active nav on scroll
+  const sections = ['home','shop','about','contact'];
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY + 100;
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      const link = document.querySelector(`.nav-links a[href="#${id}"]`);
+      if (!el || !link) return;
+      const active = y >= el.offsetTop && y < el.offsetTop + el.offsetHeight;
+      link.classList.toggle('active', active);
+    });
+  });
+</script>
+</body>
+</html>
