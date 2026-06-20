@@ -11,6 +11,7 @@ const ADMIN_CREDENTIALS = [
 ];
 
 const SESSION_KEY = "ctc_admin_session";
+const PRODUCTS_API = "https://ctc-fashion-store-default-rtdb.firebaseio.com/products.json";
 let products = [];
 let editingId = null;
 let deleteTargetId = null;
