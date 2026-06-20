@@ -4,6 +4,7 @@
 
 const WHATSAPP_NUMBER = "263771621449"; // international format, no +
 const STORE_NAME = "CTC Fashion & Luggage Wear";
+const PRODUCTS_API = "https://ctc-fashion-store-default-rtdb.firebaseio.com/products.json";
 
 let products = [];
 let cart = JSON.parse(localStorage.getItem('ctc-cart') || '[]');
@@ -12,7 +13,7 @@ let currentFilter = 'All';
 // ---------- Load Products ----------
 async function loadProducts() {
   try {
-    const res = await fetch('data/products.json');
+    const res = await fetch(PRODUCTS_API);
     products = await res.json();
     renderProducts(products);
   } catch (e) {
