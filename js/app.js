@@ -14,10 +14,11 @@ let currentFilter = 'All';
 async function loadProducts() {
   try {
     const res = await fetch(PRODUCTS_API);
-    products = await res.json();
+    const data = await res.json();
+    products = Array.isArray(data) ? data : Object.values(data || {});
     renderProducts(products);
   } catch (e) {
-    console.warn('Could not load products.json, using demo data.');
+    console.warn('Could not load live products, using demo data.');
     products = getDemoProducts();
     renderProducts(products);
   }
