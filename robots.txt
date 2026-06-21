@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /admin.html
+
+Sitemap: https://ctcfashion.github.io/CTC---Store/sitemap.xml
