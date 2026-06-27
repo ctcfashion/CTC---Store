@@ -96,29 +96,57 @@ function togglePassword() {
 }
 
 // =============================================
-//   PRODUCTS (stored in localStorage)
+//   PRODUCTS — Firebase REST API
 // =============================================
+let productsLoaded = false; // safety flag — never save until products are confirmed loaded
+
 function loadProducts() {
+  productsLoaded = false;
   fetch(PRODUCTS_API)
     .then(r => r.json())
     .then(data => {
-      products = Array.isArray(data) ? data : Object.values(data || {});
+      const loaded = Array.isArray(data) ? data : Object.values(data || {});
+      if (loaded.length > 0) {
+        products = loaded;
+        productsLoaded = true;
+      } else {
+        // Database returned empty — don't overwrite, just show empty state
+        products = [];
+        productsLoaded = true;
+      }
       refreshAll();
     })
     .catch(() => {
-      showAdminToast("⚠️ Could not load live products. Check internet connection.", "error");
-      products = getDefaultProducts();
+      showAdminToast("⚠️ Could not load products. Check internet connection.", "error");
+      productsLoaded = false; // block saves if load failed
+      products = [];
       refreshAll();
     });
 }
 
 function saveProducts() {
+  // Safety check — never save if products haven't been confirmed loaded from Firebase
+  if (!productsLoaded) {
+    showAdminToast("⚠️ Cannot save — products not fully loaded yet.", "error");
+    return;
+  }
+
+  // Safety check — never overwrite database with empty array unless user explicitly deleted all
+  if (products.length === 0) {
+    const confirmed = confirm("⚠️ You are about to clear ALL products from the database. Are you sure?");
+    if (!confirmed) return;
+  }
+
   fetch(PRODUCTS_API, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(products)
-  }).catch(() => {
-    showAdminToast("⚠️ Could not save changes. Check internet connection.", "error");
+  })
+  .then(r => {
+    if (!r.ok) throw new Error("Save failed: " + r.status);
+  })
+  .catch((err) => {
+    showAdminToast("⚠️ Could not save changes: " + err.message, "error");
   });
 }
 
@@ -265,13 +293,19 @@ function openEditProduct(id) {
   document.getElementById("f-price").value      = p.price;
   document.getElementById("f-category").value   = p.category;
   document.getElementById("f-stock").value      = p.stock ?? 10;
-  document.getElementById("f-image").value      = p.image && !p.image.startsWith("data:") ? p.image : "";
   document.getElementById("f-description").value = p.description;
   document.getElementById("f-featured").checked  = p.featured;
   document.getElementById("f-bestseller").checked = p.bestSeller;
 
+  // Load images — support new images array or legacy single image
+  const imgs = Array.isArray(p.images) && p.images.length > 0 ? p.images : [p.image || ""];
+  document.getElementById("f-image").value  = imgs[0] && !imgs[0].startsWith("data:") ? imgs[0] : "";
+  document.getElementById("f-image2").value = imgs[1] || "";
+  document.getElementById("f-image3").value = imgs[2] || "";
+  document.getElementById("f-image4").value = imgs[3] || "";
+
   resetPhotoPreview();
-  if (p.image) showPhotoPreview(p.image);
+  if (imgs[0]) showPhotoPreview(imgs[0]);
 
   document.getElementById("product-modal").classList.add("open");
 }
@@ -291,16 +325,22 @@ function saveProduct() {
   const featured = document.getElementById("f-featured").checked;
   const bestSeller = document.getElementById("f-bestseller").checked;
 
-  // Image priority: uploaded photo (base64) > pasted URL > existing image (if editing) > placeholder
+  // Build images array — main image first, then extras
   const urlField = document.getElementById("f-image").value.trim();
-  let image = currentPhotoData || urlField;
-  if (!image && editingId) {
+  let mainImage = currentPhotoData || urlField;
+  if (!mainImage && editingId) {
     const existing = products.find(p => p.id === editingId);
-    image = existing ? existing.image : "";
+    const existImgs = Array.isArray(existing?.images) ? existing.images : [existing?.image || ""];
+    mainImage = existImgs[0] || "";
   }
-  if (!image) {
-    image = `https://placehold.co/600x600/1565C0/FFFFFF?text=${encodeURIComponent(name || "CTC")}`;
-  }
+  if (!mainImage) mainImage = `https://placehold.co/600x600/1565C0/FFFFFF?text=${encodeURIComponent(name || "CTC")}`;
+
+  const extra = ["f-image2","f-image3","f-image4"]
+    .map(id => document.getElementById(id).value.trim())
+    .filter(Boolean);
+
+  const images = [mainImage, ...extra];
+  const image = mainImage; // keep backward compat
 
   if (!name || !price || !category) {
     showAdminToast("⚠️ Please fill in all required fields.", "error");
@@ -309,15 +349,16 @@ function saveProduct() {
 
   if (editingId) {
     const idx = products.findIndex(p => p.id === editingId);
-    products[idx] = { ...products[idx], name, price, category, stock, image, description: desc, featured, bestSeller };
+    products[idx] = { ...products[idx], name, price, category, stock, image, images, description: desc, featured, bestSeller };
     showAdminToast("✅ Product updated successfully!", "success");
   } else {
     const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-    products.push({ id: newId, name, price, category, stock, image, description: desc, featured, bestSeller, rating: 4.5, reviews: 0 });
+    products.push({ id: newId, name, price, category, stock, image, images, description: desc, featured, bestSeller, rating: 4.5, reviews: 0 });
     showAdminToast("✅ Product added successfully!", "success");
   }
 
   saveProducts();
+
   refreshAll();
   closeProductModal();
 }
