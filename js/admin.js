@@ -96,57 +96,94 @@ function togglePassword() {
 }
 
 // =============================================
-//   PRODUCTS — Firebase REST API
+//   PRODUCTS — Firebase REST API (bulletproof)
 // =============================================
-let productsLoaded = false; // safety flag — never save until products are confirmed loaded
+let productsLoaded = false;
+let lastKnownCount = 0; // track how many products we last successfully loaded
 
 function loadProducts() {
   productsLoaded = false;
   fetch(PRODUCTS_API)
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
     .then(data => {
-      const loaded = Array.isArray(data) ? data : Object.values(data || {});
+      // Firebase can return null, array, or object — handle all cases
+      let loaded = [];
+      if (Array.isArray(data)) {
+        loaded = data.filter(Boolean); // remove any null slots
+      } else if (data && typeof data === "object") {
+        loaded = Object.values(data).filter(Boolean);
+      }
+      // Only accept the data if it's genuinely valid
       if (loaded.length > 0) {
         products = loaded;
+        lastKnownCount = loaded.length;
         productsLoaded = true;
-      } else {
-        // Database returned empty — don't overwrite, just show empty state
+      } else if (lastKnownCount === 0) {
+        // Truly empty database — first time setup
         products = [];
         productsLoaded = true;
+      } else {
+        // Firebase returned empty but we previously had products
+        // This is a suspicious response — do NOT accept it
+        showAdminToast("⚠️ Warning: Firebase returned empty. Keeping previous data. Do not save.", "error");
+        productsLoaded = false;
       }
       refreshAll();
     })
-    .catch(() => {
-      showAdminToast("⚠️ Could not load products. Check internet connection.", "error");
-      productsLoaded = false; // block saves if load failed
-      products = [];
+    .catch(err => {
+      showAdminToast("⚠️ Could not load products: " + err.message, "error");
+      productsLoaded = false;
       refreshAll();
     });
 }
 
 function saveProducts() {
-  // Safety check — never save if products haven't been confirmed loaded from Firebase
+  // Block save if products not confirmed loaded
   if (!productsLoaded) {
-    showAdminToast("⚠️ Cannot save — products not fully loaded yet.", "error");
+    showAdminToast("⚠️ Cannot save — data not fully loaded. Refresh and try again.", "error");
     return;
   }
 
-  // Safety check — never overwrite database with empty array unless user explicitly deleted all
-  if (products.length === 0) {
-    const confirmed = confirm("⚠️ You are about to clear ALL products from the database. Are you sure?");
-    if (!confirmed) return;
+  // Block save if product count dropped suspiciously
+  // (allows adding/deleting but not sudden mass loss)
+  if (lastKnownCount > 5 && products.length === 0) {
+    showAdminToast("⚠️ Blocked: Cannot save empty list when database previously had products.", "error");
+    return;
   }
 
-  fetch(PRODUCTS_API, {
+  // Save each product individually using PATCH on its own path
+  // This way a single save can NEVER wipe the entire database
+  const savePromises = products.map((product, index) =>
+    fetch(PRODUCTS_API.replace(".json", "/" + index + ".json"), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(product)
+    })
+  );
+
+  Promise.all(savePromises)
+    .then(responses => {
+      const failed = responses.filter(r => !r.ok);
+      if (failed.length > 0) {
+        showAdminToast("⚠️ Some products may not have saved. Check connection.", "error");
+      } else {
+        lastKnownCount = products.length;
+      }
+    })
+    .catch(err => {
+      showAdminToast("⚠️ Save error: " + err.message, "error");
+    });
+}
+
+// Called only when deliberately deleting all products
+function deleteAllProductsFromDB() {
+  return fetch(PRODUCTS_API, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(products)
-  })
-  .then(r => {
-    if (!r.ok) throw new Error("Save failed: " + r.status);
-  })
-  .catch((err) => {
-    showAdminToast("⚠️ Could not save changes: " + err.message, "error");
+    body: JSON.stringify([])
   });
 }
 

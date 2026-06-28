@@ -14,12 +14,25 @@ let currentFilter = 'All';
 async function loadProducts() {
   try {
     const res = await fetch(PRODUCTS_API);
+    if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
-    products = Array.isArray(data) ? data : Object.values(data || {});
+    // Firebase can return array with null slots or an object — handle both
+    if (Array.isArray(data)) {
+      products = data.filter(Boolean);
+    } else if (data && typeof data === "object") {
+      products = Object.values(data).filter(Boolean);
+    } else {
+      products = [];
+    }
     renderProducts(products);
   } catch (e) {
-    console.warn('Could not load live products, using demo data.');
-    products = getDemoProducts();
+    console.warn('Could not load live products, using local data.');
+    try {
+      const res2 = await fetch('data/products.json');
+      products = await res2.json();
+    } catch {
+      products = getDemoProducts();
+    }
     renderProducts(products);
   }
 }
@@ -98,13 +111,36 @@ function doSearch(query) {
   document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ---------- Product Modal ----------
+// ---------- Product Modal with Gallery ----------
 function openProduct(id) {
   const p = products.find(x => x.id === id);
   if (!p) return;
   const modal = document.getElementById('product-modal');
-  modal.querySelector('.modal-img img').src = p.image;
-  modal.querySelector('.modal-img img').alt = p.name;
+
+  // Build image list — support images array or single image
+  const imgs = Array.isArray(p.images) && p.images.length > 0
+    ? p.images
+    : [p.image].filter(Boolean);
+
+  // Set main image
+  const mainImg = document.getElementById('gallery-main-img');
+  mainImg.src = imgs[0] || '';
+  mainImg.alt = p.name;
+
+  // Build thumbnails
+  const thumbsEl = document.getElementById('gallery-thumbs');
+  if (imgs.length > 1) {
+    thumbsEl.innerHTML = imgs.map((src, i) => `
+      <img class="gallery-thumb ${i === 0 ? 'active' : ''}" src="${src}" alt="${p.name} view ${i+1}"
+        onclick="switchGalleryImage(this, '${src}')">
+    `).join('');
+    thumbsEl.style.display = 'flex';
+  } else {
+    thumbsEl.innerHTML = '';
+    thumbsEl.style.display = 'none';
+  }
+
+  // Set product info
   modal.querySelector('.modal-category').textContent = p.category;
   modal.querySelector('.modal-name').textContent = p.name;
   modal.querySelector('.modal-price').textContent = `$${p.price.toFixed(2)}`;
@@ -114,12 +150,52 @@ function openProduct(id) {
   modal.dataset.productId = id;
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
+  // Push history state so phone back button closes modal instead of leaving page
+  history.pushState({ modal: 'product' }, '');
+}
+
+function switchGalleryImage(thumb, src) {
+  document.getElementById('gallery-main-img').src = src;
+  document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
 }
 
 function closeModal() {
   document.getElementById('product-modal').classList.remove('open');
   document.body.style.overflow = '';
 }
+
+// ---------- Lightbox ----------
+function openLightbox(src) {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightbox-img');
+  img.src = src;
+  img.classList.remove('zoomed');
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  history.pushState({ modal: 'lightbox' }, '');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = 'hidden'; // keep modal scroll locked
+}
+
+// Double-tap / click to zoom in lightbox
+document.addEventListener('DOMContentLoaded', () => {
+  let lastTap = 0;
+  const lbImg = document.getElementById('lightbox-img');
+  if (lbImg) {
+    lbImg.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        this.classList.toggle('zoomed');
+      }
+      lastTap = now;
+    });
+  }
+});
 
 function changeModalQty(delta) {
   const el = document.getElementById('modal-qty');
@@ -220,6 +296,7 @@ function openCart() {
   document.getElementById('cart-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   renderCartItems();
+  history.pushState({ modal: 'cart' }, '');
 }
 
 function closeCart() {
@@ -284,7 +361,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ESC key
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); closeCart(); }
+    if (e.key === 'Escape') { closeModal(); closeCart(); closeLightbox(); }
+  });
+
+  // Phone back button — close modals instead of leaving page
+  window.addEventListener('popstate', function(e) {
+    if (document.getElementById('lightbox').classList.contains('open')) {
+      closeLightbox();
+    } else if (document.getElementById('product-modal').classList.contains('open')) {
+      closeModal();
+    } else if (document.getElementById('cart-drawer').classList.contains('open')) {
+      closeCart();
+    }
   });
 });
 
