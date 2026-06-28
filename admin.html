@@ -368,11 +368,53 @@
               <input type="file" id="f-photo-file" accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
               <button type="button" class="topbar-btn topbar-btn-outline" style="width:100%;justify-content:center;margin-bottom:8px" onclick="document.getElementById('f-photo-file').click()">📁 Choose Photo from Device</button>
               <button type="button" id="photo-remove-btn" class="topbar-btn" style="width:100%;justify-content:center;background:var(--danger-light);color:var(--danger);display:none" onclick="removePhoto()">✕ Remove Photo</button>
-              <div style="font-size:0.72rem;color:var(--grey-400);margin-top:4px">Or paste an image link below</div>
+              <div style="font-size:0.72rem;color:var(--grey-400);margin-top:4px">Or paste image links below</div>
             </div>
           </div>
-          <input class="admin-input" id="f-image" placeholder="https://… (optional image link)" style="margin-top:8px" oninput="handleUrlInput(this.value)">
+          <input class="admin-input" id="f-image" placeholder="Main image URL (required)" style="margin-top:8px" oninput="handleUrlInput(this.value)">
           <div id="photo-size-warning" style="display:none;font-size:0.72rem;color:var(--warning);margin-top:6px">⚠️ Large photo — it's been compressed to save space.</div>
+          <div style="margin-top:10px">
+            <div style="font-size:0.78rem;font-weight:600;color:var(--grey-600);margin-bottom:10px">📸 Additional Photos (up to 3 more angles):</div>
+
+            <!-- Extra Photo 2 -->
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div id="prev2" style="width:54px;height:54px;border-radius:6px;border:2px dashed var(--grey-200);background:var(--off-white);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--grey-400);cursor:pointer;overflow:hidden;flex-shrink:0" onclick="document.getElementById('f-photo2').click()">
+                <span id="prev2-ph">📷</span>
+                <img id="prev2-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
+              </div>
+              <div style="flex:1">
+                <input type="file" id="f-photo2" accept="image/*" style="display:none" onchange="handleExtraPhoto(event,2)">
+                <button type="button" class="topbar-btn topbar-btn-outline" style="width:100%;justify-content:center;font-size:0.8rem;padding:7px 10px" onclick="document.getElementById('f-photo2').click()">📁 Photo 2 (side angle)</button>
+              </div>
+              <button type="button" onclick="removeExtraPhoto(2)" style="background:none;border:none;color:var(--grey-400);font-size:1rem;cursor:pointer" title="Remove">✕</button>
+            </div>
+
+            <!-- Extra Photo 3 -->
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div id="prev3" style="width:54px;height:54px;border-radius:6px;border:2px dashed var(--grey-200);background:var(--off-white);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--grey-400);cursor:pointer;overflow:hidden;flex-shrink:0" onclick="document.getElementById('f-photo3').click()">
+                <span id="prev3-ph">📷</span>
+                <img id="prev3-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
+              </div>
+              <div style="flex:1">
+                <input type="file" id="f-photo3" accept="image/*" style="display:none" onchange="handleExtraPhoto(event,3)">
+                <button type="button" class="topbar-btn topbar-btn-outline" style="width:100%;justify-content:center;font-size:0.8rem;padding:7px 10px" onclick="document.getElementById('f-photo3').click()">📁 Photo 3 (back view)</button>
+              </div>
+              <button type="button" onclick="removeExtraPhoto(3)" style="background:none;border:none;color:var(--grey-400);font-size:1rem;cursor:pointer" title="Remove">✕</button>
+            </div>
+
+            <!-- Extra Photo 4 -->
+            <div style="display:flex;align-items:center;gap:10px">
+              <div id="prev4" style="width:54px;height:54px;border-radius:6px;border:2px dashed var(--grey-200);background:var(--off-white);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--grey-400);cursor:pointer;overflow:hidden;flex-shrink:0" onclick="document.getElementById('f-photo4').click()">
+                <span id="prev4-ph">📷</span>
+                <img id="prev4-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
+              </div>
+              <div style="flex:1">
+                <input type="file" id="f-photo4" accept="image/*" style="display:none" onchange="handleExtraPhoto(event,4)">
+                <button type="button" class="topbar-btn topbar-btn-outline" style="width:100%;justify-content:center;font-size:0.8rem;padding:7px 10px" onclick="document.getElementById('f-photo4').click()">📁 Photo 4 (detail shot)</button>
+              </div>
+              <button type="button" onclick="removeExtraPhoto(4)" style="background:none;border:none;color:var(--grey-400);font-size:1rem;cursor:pointer" title="Remove">✕</button>
+            </div>
+          </div>
         </div>
         <div class="form-group full">
           <label class="admin-label">Description</label>
