@@ -299,7 +299,19 @@
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-grid">
-      <div class="modal-img"><img src="" alt=""></div>
+
+      <!-- IMAGE GALLERY -->
+      <div class="modal-gallery">
+        <!-- Main image with zoom -->
+        <div class="gallery-main" id="gallery-main">
+          <img id="gallery-main-img" src="" alt="" onclick="openLightbox(this.src)">
+          <button class="zoom-btn" onclick="openLightbox(document.getElementById('gallery-main-img').src)" title="Zoom">🔍</button>
+        </div>
+        <!-- Thumbnails row -->
+        <div class="gallery-thumbs" id="gallery-thumbs"></div>
+      </div>
+
+      <!-- PRODUCT INFO -->
       <div class="modal-body">
         <div class="modal-category"></div>
         <div class="modal-name"></div>
@@ -319,6 +331,15 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- ========== LIGHTBOX (full screen zoom) ========== -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <div class="lightbox-inner" id="lightbox-inner">
+    <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+  </div>
+  <div class="lightbox-hint">Pinch to zoom • Double-tap to zoom • Tap outside to close</div>
 </div>
 
 <!-- ========== CART DRAWER ========== -->
